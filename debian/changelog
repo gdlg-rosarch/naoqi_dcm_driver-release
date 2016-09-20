@@ -1,0 +1,23 @@
+ros-indigo-naoqi-dcm-driver (0.0.2-0trusty) trusty; urgency=high
+
+  * fixed Autonomous Life call
+  * wakeup the robot during initialization
+  * Contributors: nlyubova
+
+ -- Natalia Lyubova <natalia.lyubova@gmail.com>  Mon, 19 Sep 2016 22:00:00 -0000
+
+ros-indigo-naoqi-dcm-driver (0.0.1-0trusty) trusty; urgency=high
+
+  * refactoring
+  * adding a wrapper for Memory Proxy
+  * updating the README
+  * exit Touch service
+  * adding the diagnostics class
+  * adding tools for AnyValue conversion
+  * fixing velocity control
+  * initial commit
+  * Contributors: Natalia Lyubova
+
+ -- Natalia Lyubova <natalia.lyubova@gmail.com>  Thu, 15 Sep 2016 22:00:00 -0000
+
+
