@@ -115,7 +115,7 @@ int main(int argc, char** argv)
   }
   catch (const std::exception& e)
   {
-    ROS_INFO("Did not stop ALTouch: %s", e.what());
+    ROS_DEBUG("Did not stop ALTouch: %s", e.what());
   }
 
   // stop AutonomousLife service to prevent the robot shaking
@@ -125,13 +125,13 @@ int main(int argc, char** argv)
     if (life_proxy.call<std::string>("getState") != "disabled")
     {
       life_proxy.call<void>("setState", "disabled");
-      ROS_INFO_STREAM("Stutting down Naoqi AutonomousLife ...");
+      ROS_INFO_STREAM("Shutting down Naoqi AutonomousLife ...");
       ros::Duration(2.0).sleep();
     }
   }
   catch (const std::exception& e)
   {
-    ROS_INFO("Did not stop AutonomousLife: %s", e.what());
+    ROS_DEBUG("Did not stop AutonomousLife: %s", e.what());
   }
 
   session->registerService("naoqi_dcm_driver", robot);
