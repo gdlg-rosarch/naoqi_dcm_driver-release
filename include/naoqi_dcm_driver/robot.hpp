@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016 SoftBank Robotics Europe
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
 #ifndef NAOQI_DCM_DRIVER_H
 #define NAOQI_DCM_DRIVER_H
 
@@ -48,40 +65,47 @@ public:
   */
   Robot(qi::SessionPtr session);
 
-  //! @brief destroys all ros nodehandle and shutsdown all publisher
+  //! @brief destroy all ros nodehandle and shutsdown all publisher
   ~Robot();
 
-  //! @brief Function to stop the service
+  //! @brief stop the service
   void stopService();
 
-  //! @brief Function to check if service is connected
+  //! @brief check if the service is connected
   bool isConnected();
 
-  //! @brief Connection to ALProxies
+  //! @brief connect to ALProxies
   bool connect();
 
-  //! @brief initialization of controllers based on joints names
+  //! @brief start the main loop
+  void run();
+
+private:
+  //! @brief initialize controllers based on joints names
   bool initializeControllers(const std::vector <std::string> &joints_names);
 
-  //! @brief defining Subscribe/Advertise to ROS Topics/Services
+  //! @brief define Subscribe/Advertise to ROS Topics/Services
   void subscribe();
 
-  //! @brief loading parameters
-  void loadParams();
+  //! @brief load parameters
+  bool loadParams();
 
   //! @brief the main loop
   void controllerLoop();
 
-  //! @brief controlling the robot's velocity
+  //! @brief control the robot's velocity
   void commandVelocity(const geometry_msgs::TwistConstPtr &msg);
 
-  //! @brief publishing the base_footprint
+  //! @brief publish the base_footprint
   void publishBaseFootprint(const ros::Time &ts);
 
-  //! @brief reading joints values
+  //! @brief check HW and Naoqi joints names
+  std::vector <bool> checkJoints();
+
+  //! @brief read joints values
   void readJoints();
 
-  //! @brief publishing joint states
+  //! @brief publish joint states
   void publishJointStateFromAlMotion();
 
   //! @brief set joints values
@@ -90,13 +114,9 @@ public:
   //! @brief set stiffness
   bool setStiffness(const float &stiffness);
 
-  //! @brief start the main loop
-  void run();
-
   //! @brief ignore mimic joints from control
   void ignoreMimicJoints(std::vector <std::string> *joints);
 
-private:
   /** node handle pointer*/
   boost::scoped_ptr <ros::NodeHandle> nhPtr_;
 
@@ -112,8 +132,8 @@ private:
   /** pointer to Motion class */
   boost::shared_ptr <Motion> motion_;
 
-  /** velocity publisher */
-  ros::Subscriber cmd_vel_sub_;
+  /** subscrier to MoveTo */
+  ros::Subscriber cmd_moveto_sub_;
 
   /** base_footprint broadcaster */
   tf::TransformBroadcaster base_footprint_broadcaster_;
@@ -172,32 +192,41 @@ private:
   /** motor groups used to control */
   std::vector <std::string> motor_groups_;
 
-  /** all joints positions keys to read */
-  std::vector <std::string> keys_positions_all_;
-
   /** joints states from ROS hardware interface */
   hardware_interface::JointStateInterface jnt_state_interface_;
 
   /** joints positions from ROS hardware interface */
   hardware_interface::PositionJointInterface jnt_pos_interface_;
 
-  /** joints angles to apply */
-  std::vector <double> joint_commands_;
+  /** Naoqi joints names */
+  std::vector <std::string> qi_joints_;
 
-  /** current joints angles */
-  std::vector <double> joint_angles_;
+  /** Naoqi joints angles to apply */
+  std::vector <double> qi_commands_;
 
-  /** joints velocities from ROS hardware interface */
-  std::vector <double> joint_velocities_;
+  /** hardware interface joints names */
+  std::vector <std::string> hw_joints_;
 
-  /** joints efforts from ROS hardware interface */
-  std::vector <double> joint_efforts_;
+  /** hardware interface enabled joints */
+  std::vector <bool> hw_enabled_;
+
+  /** hardware interface joints angles to apply */
+  std::vector <double> hw_commands_;
+
+  /** hardware interface current joints angles */
+  std::vector <double> hw_angles_;
+
+  /** hardware interface joints velocities */
+  std::vector <double> hw_velocities_;
+
+  /** hardware interface joints efforts*/
+  std::vector <double> hw_efforts_;
 
   /** enable using DCM instead of ALMotion */
   bool use_dcm_;
 
-  /** enable velocity control and publish cmd_vel */
-  bool use_cmd_vel_;
+  /** stiffness value to apply */
+  float stiffness_value_;
 };
 
 #endif // NAOQI_DCM_DRIVER_H
