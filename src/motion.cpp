@@ -89,8 +89,8 @@ void Motion::wakeUp()
   {
     if (!robotIsWakeUp())
     {
-      motion_proxy_.call<void>("wakeUp");
       ROS_INFO_STREAM("Going to wakeup ...");
+      motion_proxy_.call<void>("wakeUp");
       ros::Duration(3.0).sleep();
     }
   }
@@ -106,8 +106,8 @@ void Motion::rest()
   {
     if (motion_proxy_.call<bool>("robotIsWakeUp"))
     {
-      motion_proxy_.call<void>("rest");
       ROS_INFO_STREAM("Going to rest ...");
+      motion_proxy_.call<void>("rest");
       sleep(4);
     }
   }
@@ -173,7 +173,7 @@ void Motion::moveTo(const float& vel_x, const float& vel_y, const float& vel_th)
 
   try
   {
-    motion_proxy_.async<void>("move", vel_x, vel_y, vel_th);
+    motion_proxy_.call<void>("moveTo", vel_x, vel_y, vel_th);
   }
   catch (const std::exception& e)
   {
@@ -207,7 +207,7 @@ void Motion::writeJoints(const std::vector <double> &joint_commands)
 
   try
   {
-    motion_proxy_.call<void>("setAngles", names_qi, angles_qi, 1.0f);
+    motion_proxy_.async<void>("setAngles", names_qi, angles_qi, 0.2f);
   }
   catch(const std::exception& e)
   {
