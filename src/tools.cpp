@@ -15,6 +15,8 @@
  *
 */
 
+#include <boost/algorithm/string.hpp>
+
 #include "naoqi_dcm_driver/tools.hpp"
 
 qi::AnyValue fromStringVectorToAnyValue(const std::vector<std::string> &vector)
@@ -78,8 +80,8 @@ std::vector<float> fromAnyValueToFloatVector(qi::AnyValue& value)
     }
     catch(std::runtime_error& e)
     {
-      result.push_back(-1.0f);
-      std::cout << e.what() << "=> set to -1.0f" << std::endl;
+      result.push_back(0.0f);
+      std::cout << e.what() << "=> set to 0.0f" << std::endl;
     }
   }
   return result;
@@ -108,7 +110,42 @@ std::vector<int> fromAnyValueToIntVector(qi::AnyValue& value)
 std::string print(const std::vector <std::string> &vector)
 {
   std::stringstream ss;
-  std::copy(vector.begin(), vector.end()-1, std::ostream_iterator<std::string>(ss,", "));
-  std::copy(vector.end()-1, vector.end(), std::ostream_iterator<std::string>(ss));
+  if (vector.size() > 0)
+  {
+    std::copy(vector.begin(), vector.end()-1, std::ostream_iterator<std::string>(ss,", "));
+    std::copy(vector.end()-1, vector.end(), std::ostream_iterator<std::string>(ss));
+  }
   return ss.str();
+}
+
+std::vector <std::string> toVector(const std::string &input)
+{
+  std::vector <std::string> value;
+  boost::split (value, input, boost::is_any_of(" "));
+
+  //check for empty values
+  if (!value.empty())
+    for(std::vector<std::string>::iterator it=value.begin(); it != value.end(); ++it)
+      if ((*it).empty())
+      {
+        value.erase(it);
+        it--;
+      }
+  return value;
+}
+
+void xmlToVector(XmlRpc::XmlRpcValue &topicList,
+                std::vector <std::string> *joints)
+{
+  if (topicList.size() == 0)
+  {
+    ROS_WARN("Mentioned controller does not have joints");
+    return;
+  }
+  for (int i = 0; i < topicList.size(); ++i)
+  {
+    std::string tmp = static_cast<std::string>(topicList[i]);
+    if (tmp.compare("") != std::string::npos)
+      joints->push_back(tmp);
+  }
 }
